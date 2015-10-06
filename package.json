@@ -4,15 +4,17 @@
   "description": "Our little assistant for creating NPM packages.",
   "main": "index.js",
   "scripts": {
-    "test": ""
+    "test": "standard && node ./test/*.js | tap-spec"
   },
   "keywords": [],
   "author": "Hrvoje Simic <shime@twobucks.co>",
   "license": "MIT",
   "devDependencies": {
-    "standard": "^3.0.0"
+    "standard": "^3.0.0",
+    "tap-spec": "^4.1.0",
+    "tape": "^4.2.1"
   },
-  "scripts": {
-    "test": "standard"
+  "bin": {
+    "bruck": "./bin/bruck"
   }
 }
