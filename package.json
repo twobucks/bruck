@@ -1,0 +1,12 @@
+{
+  "name": "bruck",
+  "version": "1.0.0",
+  "description": "Our little assistant for creating NPM packages.",
+  "main": "index.js",
+  "scripts": {
+    "test": ""
+  },
+  "keywords": [],
+  "author": "Hrvoje Simic <shime@twobucks.co>",
+  "license": "MIT"
+}
