@@ -6,6 +6,16 @@
 
 Our little assitant for creating NPM packages.
 
+# Features
+
+* creates a new folder with the name that was passed
+* populates package.json with the defaults saved in ~/.bruckrc
+* uses standard JS and JSDoc as dependencies (for now)
+* populates README with the deafults saved in ~/.bruckrc
+* creates LICENSE file
+* sets up testing environment
+* creates initial git commit
+
 ## License
 
 MIT

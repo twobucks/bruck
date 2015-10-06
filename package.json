@@ -8,5 +8,11 @@
   },
   "keywords": [],
   "author": "Hrvoje Simic <shime@twobucks.co>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "standard": "^3.0.0"
+  },
+  "scripts": {
+    "test": "standard"
+  }
 }
