@@ -10,11 +10,17 @@
   "author": "Hrvoje Simic <shime@twobucks.co>",
   "license": "MIT",
   "devDependencies": {
+    "deep-equal": "^1.0.1",
+    "hdiff": "^1.1.2",
     "standard": "^3.0.0",
     "tap-spec": "^4.1.0",
     "tape": "^4.2.1"
   },
   "bin": {
     "bruck": "./bin/bruck"
+  },
+  "dependencies": {
+    "chdir": "0.0.0",
+    "home-dir": "^1.0.0"
   }
 }
