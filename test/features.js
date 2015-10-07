@@ -87,8 +87,11 @@ test('populates package.json with the defaults saved in ~/.bruckrc', function (t
   })
 })
 
-test.skip('uses standard JS and JSDoc as dependencies (for now)')
-test.skip('populates README with the deafults saved in ~/.bruckrc')
+test.only('populates readme with title and description it gets as arguments', function (t) {
+  // TODO: CLI
+  t.ok(true, 'implement me')
+  t.end()
+})
+
 test.skip('creates LICENSE file')
-test.skip('sets up testing environment')
 test.skip('creates initial git commit')
