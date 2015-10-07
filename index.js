@@ -6,33 +6,27 @@ module.exports = {
   * Entry point. Creates NPM package directory
   * that is ready for development.
   *
-  * @param {string} dir - the directory name
+  * @param {string} name - the package name
+  * @param {string} description - the package description
   *
   * @public
   */
-  exec: function (dir, callback) {
-    checkSetup()
+  exec: function (name, description, callback) {
+    if (typeof (description) === 'function') {
+      callback = description
+    }
 
-    makeDir(dir, function (error) {
+    makeDir(name, function (error) {
       if (error) {
         throw error
       }
 
-      inDir(dir, function () {
+      inDir(name, function () {
       })
 
       callback()
     })
   }
-}
-
-/*
- * Checks if configuration file is setup up
- * properly.
- *
- * @private
- */
-function checkSetup () {
 }
 
 /*

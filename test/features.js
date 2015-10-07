@@ -8,8 +8,32 @@ var deepEqual = require('deep-equal')
 
 var DIRECTORY_NAME = 'chunky-bacon'
 
-function bruckExec (callback) {
-  bruck.exec(DIRECTORY_NAME, callback)
+function assertDescription(t, description){
+  // TODO
+}
+
+function assertDirectoryExists (t, name) {
+  stat(name, function (data) {
+    t.ok(data.isDirectory(name),
+         'directory named ' + name + ' exists')
+  })
+}
+
+function bruckExec (name, description, callback) {
+  if (!callback) {
+    callback = description
+  }
+
+  if (!description) {
+    callback = name
+  }
+
+  if (typeof (name) === 'function') {
+    callback = name
+    name = DIRECTORY_NAME
+  }
+
+  bruck.exec(name, callback)
 }
 
 function cleanUp (callback) {
@@ -55,11 +79,8 @@ function isPackageJSONCorrect (config) {
 
 test('creates a new folder with the name that was passed', function (t) {
   bruckExec(function () {
-    stat(DIRECTORY_NAME, function (data) {
-      t.ok(data.isDirectory(DIRECTORY_NAME),
-           'directory named ' + DIRECTORY_NAME + ' exists')
-      cleanUp(t.end)
-    })
+    assertDirectoryExists(t, DIRECTORY_NAME)
+    cleanUp(t.end)
   })
 })
 
@@ -87,10 +108,13 @@ test('populates package.json with the defaults saved in ~/.bruckrc', function (t
   })
 })
 
-test.only('populates readme with title and description it gets as arguments', function (t) {
+test('populates readme with title and description it gets as arguments', function (t) {
   // TODO: CLI
-  t.ok(true, 'implement me')
-  t.end()
+  bruckExec('npm-cat', 'meow meow', function () {
+    assertDirectoryExists(t, 'npm-cat')
+    assertDescription()
+    cleanUp(t.end)
+  })
 })
 
 test.skip('creates LICENSE file')
