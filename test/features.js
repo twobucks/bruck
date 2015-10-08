@@ -10,18 +10,14 @@ var path = require('path')
 
 var DIRECTORY_NAME = 'chunky-bacon'
 
-function assertDescription (t, dir, description) {
+function assertDescription (dir, description) {
   var packageJSON = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'))
-  t.equal(packageJSON['description'], description,
-          'description in package.json is "' + description + '"')
+  return packageJSON['description'] === description
 }
 
-function assertDirectoryExists (t, name, callback) {
-  stat(name, function (data) {
-    t.ok(data.isDirectory(name),
-         'directory named ' + name + ' exists')
-    callback()
-  })
+function assertDirectoryExists (name, callback) {
+  var stats = fs.statSync(name)
+  return stats.isDirectory(name)
 }
 
 /*
@@ -58,6 +54,20 @@ function stat (dir, callback) {
 }
 
 function setupBruckRC (data) {
+  var data =  data || {
+    'scripts': {
+      'test': 'standard && node ./test/*.js | tap-spec'
+    },
+    'author': 'Hrvoje Simic <shime@twobucks.co>',
+    'license': 'MIT',
+    'devDependencies': {
+      'deep-equal': '^1.0.1',
+      'hdiff': '^1.1.2',
+      'standard': '^3.0.0',
+      'tap-spec': '^4.1.0',
+      'tape': '^4.2.1'
+    }
+  }
   fs.appendFileSync(homeDir('.bruckrc'), JSON.stringify(data))
 }
 
@@ -67,9 +77,8 @@ function cleanUpBruckRC () {
 
 test('creates a new folder with the name that was passed', function (t) {
   bruck.exec(DIRECTORY_NAME, function () {
-    assertDirectoryExists(t, DIRECTORY_NAME, function () {
-      cleanUp(t.end)
-    })
+    t.ok(assertDirectoryExists(DIRECTORY_NAME), 'directory ' + DIRECTORY_NAME + ' exists')
+    cleanUp(t.end)
   })
 })
 
@@ -93,33 +102,19 @@ test('populates package.json with the defaults saved in ~/.bruckrc', function (t
   bruck.exec(DIRECTORY_NAME, function () {
     t.ok(assertPackageJSONPopulated(DIRECTORY_NAME, config),
          'package.json gets correct values from ~/.bruckrc')
+
     cleanUp(t.end)
     cleanUpBruckRC()
   })
 })
 
 test('populates readme with title and description it gets as arguments', function (t) {
-  var config = {
-    'scripts': {
-      'test': 'standard && node ./test/*.js | tap-spec'
-    },
-    'author': 'Hrvoje Simic <shime@twobucks.co>',
-    'license': 'MIT',
-    'devDependencies': {
-      'deep-equal': '^1.0.1',
-      'hdiff': '^1.1.2',
-      'standard': '^3.0.0',
-      'tap-spec': '^4.1.0',
-      'tape': '^4.2.1'
-    }
-  }
-  setupBruckRC(config)
+  setupBruckRC()
 
   bruck.exec('npm-cat', 'meow meow', function () {
-    assertDirectoryExists(t, 'npm-cat', function () {
-      assertDescription(t, 'npm-cat', 'meow meow')
-      cleanUp(t.end)
-    })
+    t.ok(assertDirectoryExists('npm-cat'), 'directory named npm-cat exists')
+    t.ok(assertDescription('npm-cat', 'meow meow'), 'description is "meow meow"')
+    cleanUp(t.end)
   })
 })
 
