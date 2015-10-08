@@ -5,35 +5,41 @@ var exec = require('child_process').exec
 var homeDir = require('home-dir')
 var diff = require('hdiff')
 var deepEqual = require('deep-equal')
+var chdir = require('chdir')
+var path = require('path')
 
 var DIRECTORY_NAME = 'chunky-bacon'
 
-function assertDescription(t, description){
-  // TODO
+function assertDescription (t, dir, description) {
+  var packageJSON = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'))
+  t.equal(packageJSON['description'], description,
+          'description in package.json is "' + description + '"')
 }
 
-function assertDirectoryExists (t, name) {
+function assertDirectoryExists (t, name, callback) {
   stat(name, function (data) {
     t.ok(data.isDirectory(name),
          'directory named ' + name + ' exists')
+    callback()
   })
 }
 
-function bruckExec (name, description, callback) {
-  if (!callback) {
-    callback = description
-  }
+/*
+ * Checks if package.json contains correct values
+ * copied from ~/.bruckrc.
+ */
+function assertPackageJSONPopulated (dir, config) {
+  var packageJSON = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'))
+  var patch = diff(config, packageJSON)
 
-  if (!description) {
-    callback = name
-  }
+  var keys = Object.keys(config)
+  keys.forEach(function (key) {
+    if (!deepEqual(config[key], patch[key])) {
+      return false
+    }
+  })
 
-  if (typeof (name) === 'function') {
-    callback = name
-    name = DIRECTORY_NAME
-  }
-
-  bruck.exec(name, callback)
+  return true
 }
 
 function cleanUp (callback) {
@@ -52,35 +58,18 @@ function stat (dir, callback) {
 }
 
 function setupBruckRC (data) {
-  fs.appendFileSync(homeDir('.bruckrc'), data)
+  fs.appendFileSync(homeDir('.bruckrc'), JSON.stringify(data))
 }
 
 function cleanUpBruckRC () {
   exec('rm ~/.bruckrc')
 }
 
-/*
- * Checks if package.json contains correct values
- * copied from ~/.bruckrc.
- */
-function isPackageJSONCorrect (config) {
-  var packageJSON = JSON.parse(fs.readFileSync('package.json', 'utf-8'))
-  var patch = diff(config, packageJSON)
-
-  var keys = Object.keys(config)
-  keys.forEach(function (key) {
-    if (!deepEqual(config[key], patch[key])) {
-      return false
-    }
-  })
-
-  return true
-}
-
 test('creates a new folder with the name that was passed', function (t) {
-  bruckExec(function () {
-    assertDirectoryExists(t, DIRECTORY_NAME)
-    cleanUp(t.end)
+  bruck.exec(DIRECTORY_NAME, function () {
+    assertDirectoryExists(t, DIRECTORY_NAME, function () {
+      cleanUp(t.end)
+    })
   })
 })
 
@@ -101,19 +90,36 @@ test('populates package.json with the defaults saved in ~/.bruckrc', function (t
   }
   setupBruckRC(config)
 
-  bruckExec(function () {
-    t.ok(isPackageJSONCorrect(config), 'package.json gets correct values from ~/.bruckrc')
+  bruck.exec(DIRECTORY_NAME, function () {
+    t.ok(assertPackageJSONPopulated(DIRECTORY_NAME, config),
+         'package.json gets correct values from ~/.bruckrc')
     cleanUp(t.end)
     cleanUpBruckRC()
   })
 })
 
 test('populates readme with title and description it gets as arguments', function (t) {
-  // TODO: CLI
-  bruckExec('npm-cat', 'meow meow', function () {
-    assertDirectoryExists(t, 'npm-cat')
-    assertDescription()
-    cleanUp(t.end)
+  var config = {
+    'scripts': {
+      'test': 'standard && node ./test/*.js | tap-spec'
+    },
+    'author': 'Hrvoje Simic <shime@twobucks.co>',
+    'license': 'MIT',
+    'devDependencies': {
+      'deep-equal': '^1.0.1',
+      'hdiff': '^1.1.2',
+      'standard': '^3.0.0',
+      'tap-spec': '^4.1.0',
+      'tape': '^4.2.1'
+    }
+  }
+  setupBruckRC(config)
+
+  bruck.exec('npm-cat', 'meow meow', function () {
+    assertDirectoryExists(t, 'npm-cat', function () {
+      assertDescription(t, 'npm-cat', 'meow meow')
+      cleanUp(t.end)
+    })
   })
 })
 

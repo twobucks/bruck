@@ -20,7 +20,7 @@ MIT
 
 ## Sponsors
 
-Two Bucks Ltd © 2015
+Two Bucks Ltd. © 2015
 
 <a href="https://twobucks.co">
   ![https://twobucks.co](https://twobucks.co/assets/images/logo-small.png)
