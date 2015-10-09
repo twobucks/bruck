@@ -9,6 +9,8 @@ var merge = require('deep-extend')
 var homeDir = require('home-dir')
 var path = require('path')
 
+var TemplateError = require('./template_error')
+
 module.exports = {
  /*
   * Entry point. Creates NPM package directory
@@ -71,9 +73,13 @@ module.exports = {
    */
 
   __evaluteTemplate: function(template){
+    try {
     return template.replace(/\%\{([^\}]*)\}/g, function(_, match){
       return eval(match).toString()
     })
+    } catch(ex) {
+      throw new TemplateError(ex)
+    }
   },
 }
 
