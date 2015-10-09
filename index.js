@@ -22,6 +22,8 @@ module.exports = {
   */
 
   exec: function (name, description, callback) {
+    var self = this
+
     if (typeof (description) === 'function') {
       callback = description
     }
@@ -33,25 +35,46 @@ module.exports = {
 
       var packageJSON = path.join('template', 'package.json')
       var t = template(packageJSON)
-      copyLicense(name)
+      self.__copyLicense(name)
       writePackageJSON(name, description, t, readBruckRC())
 
       callback()
     })
-  }
-}
+  },
 
-/*
- * Copies license from template.
- *
- * @param {string} dir target directory
- *
- * @private
- */
+  /*
+   * Copies license from template.
+   *
+   * @param {string} dir target directory
+   *
+   * @private
+   */
 
-function copyLicense(dir){
-  var template = fs.readFileSync(path.join('template', 'LICENSE'), 'utf8')
-  fs.writeFileSync(path.join(dir, 'LICENSE'), template)
+   __copyLicense: function(dir){
+    var template = fs.readFileSync(path.join('template', 'LICENSE'), 'utf8')
+    fs.writeFileSync(path.join(dir, 'LICENSE'), this.__evaluteTemplate(template))
+  },
+
+
+  /*
+   * Evaluates expressions inside a template.
+   * Expressions are surrounded with %{} tags.
+   *
+   * Example:
+   *
+   *   __evaluateTemplate("%{1 + 2}") === "3" // true
+   *
+   * @param {string} template
+   * @returns {string} string after evaluation of all expressions
+   *
+   * @private
+   */
+
+  __evaluteTemplate: function(template){
+    return template.replace(/\%\{([^\}]*)\}/g, function(_, match){
+      return eval(match).toString()
+    })
+  },
 }
 
 /*
