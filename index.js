@@ -33,18 +33,32 @@ module.exports = {
 
       var packageJSON = path.join('template', 'package.json')
       var t = template(packageJSON)
-      chdir(name, function () {
-        writePackageJSON(description, t, readBruckRC())
-      })
+      copyLicense(name)
+      writePackageJSON(name, description, t, readBruckRC())
+
       callback()
     })
   }
 }
 
 /*
+ * Copies license from template.
+ *
+ * @param {string} dir target directory
+ *
+ * @private
+ */
+
+function copyLicense(dir){
+  var template = fs.readFileSync(path.join('template', 'LICENSE'), 'utf8')
+  fs.writeFileSync(path.join(dir, 'LICENSE'), template)
+}
+
+/*
  * Writes package.json by combining options passed.
  * Options from config take precedence.
  *
+ * @param {string} directory target directory
  * @param {string} description
  * @param {Object} templateOptions
  * @param {Object} [configOptions] options read from config (~/.bruckrc by default)
@@ -52,9 +66,9 @@ module.exports = {
  * @private
  */
 
-function writePackageJSON (description, templateOptions, configOptions) {
+function writePackageJSON (directory, description, templateOptions, configOptions) {
   configOptions['description'] = description || configOptions['description']
-  fs.appendFileSync('package.json', JSON.stringify(merge(templateOptions, configOptions)))
+  fs.appendFileSync(path.join(directory, 'package.json'), JSON.stringify(merge(templateOptions, configOptions)))
 }
 
 /*

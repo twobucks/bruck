@@ -22,7 +22,7 @@ function assertDirectoryExists (name, callback) {
 
 /*
  * Checks if package.json contains correct values
- * copied from ~/.bruckrc.
+ * from ~/.bruckrc.
  */
 function assertPackageJSONPopulated (dir, config) {
   var packageJSON = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'))
@@ -36,6 +36,11 @@ function assertPackageJSONPopulated (dir, config) {
   })
 
   return true
+}
+
+function assertLicenseYear(dir){
+  var license = fs.readFileSync(path.join(dir, 'LICENSE'), 'utf-8').toString()
+  return license.indexOf(new Date().getFullYear()) > -1
 }
 
 function cleanUp (callback) {
@@ -77,7 +82,7 @@ function cleanUpBruckRC () {
 
 test('creates a new folder with the name that was passed', function (t) {
   bruck.exec(DIRECTORY_NAME, function () {
-    t.ok(assertDirectoryExists(DIRECTORY_NAME), 'directory ' + DIRECTORY_NAME + ' exists')
+    t.ok(assertDirectoryExists(DIRECTORY_NAME), 'directory "' + DIRECTORY_NAME + '" exists')
     cleanUp(t.end)
   })
 })
@@ -112,11 +117,19 @@ test('populates readme with title and description it gets as arguments', functio
   setupBruckRC()
 
   bruck.exec('npm-cat', 'meow meow', function () {
-    t.ok(assertDirectoryExists('npm-cat'), 'directory named npm-cat exists')
     t.ok(assertDescription('npm-cat', 'meow meow'), 'description is "meow meow"')
     cleanUp(t.end)
   })
 })
 
-test.skip('creates LICENSE file')
+test('creates LICENSE file with proper year', function(t){
+  // TODO: stop hardcoding year in LICENSE file
+  bruck.exec(DIRECTORY_NAME, function () {
+    t.ok(assertLicenseYear(DIRECTORY_NAME), 'license contains current year')
+    t.end()
+  })
+})
+
+test.skip('creates README file and populates name/description')
+test.skip('creates README file with Travis badge')
 test.skip('creates initial git commit')
