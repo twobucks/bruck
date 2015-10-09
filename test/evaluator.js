@@ -6,4 +6,11 @@ test('it evaluates expressions', function(t){
   t.end()
 })
 
-test.skip('it raises meaningful errors when things go wrong')
+test('it raises errors when things go wrong', function(t){
+  t.throws(function(){
+    evaluate("%{chunky}")
+  }, /chunky is not defined/, 'it raises errors')
+  t.end()
+})
+
+test.skip('it gives more information about the error') // where and why - the most important questions when it comes to debugging
