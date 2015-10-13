@@ -38,6 +38,7 @@ module.exports = {
       var packageJSON = path.join('template', 'package.json')
       var t = template(packageJSON)
       self.__copyLicense(name)
+      self.__copyReadme(name, description)
       writePackageJSON(name, description, t, readBruckRC())
 
       callback()
@@ -57,6 +58,19 @@ module.exports = {
     fs.writeFileSync(path.join(dir, 'LICENSE'), this.__evaluteTemplate(template))
   },
 
+  /*
+   * Copies readme from template.
+   *
+   * @param {string} dir target directory
+   *
+   * @private
+   */
+
+   __copyReadme: function(name, description){
+    var template = fs.readFileSync(path.join('template', 'README.md'), 'utf8')
+    fs.writeFileSync(path.join(name, 'README.md'), this.__evaluteTemplate(template, name, description))
+  },
+
 
   /*
    * Evaluates expressions inside a template.
@@ -72,7 +86,7 @@ module.exports = {
    * @private
    */
 
-  __evaluteTemplate: function(template){
+  __evaluteTemplate: function(template, name, description){
     try {
     return template.replace(/\%\{([^\}]*)\}/g, function(_, match){
       return eval(match).toString()

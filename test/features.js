@@ -43,6 +43,11 @@ function assertLicenseYear(dir){
   return license.indexOf(new Date().getFullYear()) > -1
 }
 
+function assertFileMatches(path, regex){
+  var data = fs.readFileSync(path).toString()
+  return !!data.match(regex)
+}
+
 function cleanUp (callback) {
   exec('rm -rf ' + DIRECTORY_NAME, callback)
 }
@@ -125,10 +130,25 @@ test('populates readme with title and description it gets as arguments', functio
 test('creates LICENSE file with proper year', function(t){
   bruck.exec(DIRECTORY_NAME, function () {
     t.ok(assertLicenseYear(DIRECTORY_NAME), 'license contains current year')
-    t.end()
+    cleanUp(t.end)
   })
 })
 
-test.skip('creates README file and populates name/description')
+test('creates README file and with the correct title', function(t){
+  bruck.exec('chunky-bacon', function(){
+    t.ok(assertFileMatches('chunky-bacon/README.md', /# chunky-bacon/),
+        'readme title is \'chunky-bacon\'')
+    cleanUp(t.end)
+  })
+})
+
+test('creates README file and with the correct description', function(t){
+  bruck.exec('chunky-bacon', 'super tasty bacon', function(){
+    t.ok(assertFileMatches('chunky-bacon/README.md', /super tasty bacon/),
+        'readme description is \'super tasty bacon\'')
+    cleanUp(t.end)
+  })
+})
+
 test.skip('creates README file with Travis badge')
 test.skip('creates initial git commit')
