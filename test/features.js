@@ -150,5 +150,11 @@ test('creates README file and with the correct description', function(t){
   })
 })
 
-test.skip('creates README file with Travis badge')
+test('creates README file with Travis badge', function(t){
+  bruck.exec('chunky-bacon', function(){
+    t.ok(assertFileMatches('chunky-bacon/README.md', "https://travis-ci.org/twobucks/chunky-bacon"),
+        'readme description is \'super tasty bacon\'')
+    cleanUp(t.end)
+  })
+})
 test.skip('creates initial git commit')
