@@ -8,6 +8,7 @@ var chdir = require('chdir')
 var merge = require('deep-extend')
 var homeDir = require('home-dir')
 var path = require('path')
+var execSync = require('child_process').execSync
 
 var TemplateError = require('./template_error')
 
@@ -40,6 +41,7 @@ module.exports = {
       self.__copyLicense(name)
       self.__copyReadme(name, description)
       writePackageJSON(name, description, t, readBruckRC())
+      self.__gitInit(name)
 
       callback()
     })
@@ -71,6 +73,17 @@ module.exports = {
     fs.writeFileSync(path.join(name, 'README.md'), this.__evaluteTemplate(template, name, description))
   },
 
+  /*
+   * Initializes a new git repo inside a given directory.
+   *
+   * @param {string} dir target directory
+   *
+   * @private
+   */
+
+  __gitInit: function(dir){
+    return execSync("cd " + dir + "; git init && git commit -am 'initial commit'; cd -")
+  },
 
   /*
    * Evaluates expressions inside a template.

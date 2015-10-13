@@ -2,6 +2,7 @@ var bruck = require('../')
 var test = require('tape')
 var fs = require('fs')
 var exec = require('child_process').exec
+var execSync = require('child_process').execSync
 var homeDir = require('home-dir')
 var diff = require('hdiff')
 var deepEqual = require('deep-equal')
@@ -46,6 +47,14 @@ function assertLicenseYear(dir){
 function assertFileMatches(path, regex){
   var data = fs.readFileSync(path).toString()
   return !!data.match(regex)
+}
+
+function assertGitInitialized(dir){
+  try {
+    return execSync('ls ' + dir + '/.git')
+  } catch(ex){
+    return false
+  }
 }
 
 function cleanUp (callback) {
@@ -121,8 +130,8 @@ test('populates package.json with the defaults saved in ~/.bruckrc', function (t
 test('populates readme with title and description it gets as arguments', function (t) {
   setupBruckRC()
 
-  bruck.exec('npm-cat', 'meow meow', function () {
-    t.ok(assertDescription('npm-cat', 'meow meow'), 'description is "meow meow"')
+  bruck.exec(DIRECTORY_NAME, 'meow meow', function () {
+    t.ok(assertDescription(DIRECTORY_NAME, 'meow meow'), 'description is "meow meow"')
     cleanUp(t.end)
   })
 })
@@ -157,4 +166,10 @@ test('creates README file with Travis badge', function(t){
     cleanUp(t.end)
   })
 })
-test.skip('creates initial git commit')
+
+test('creates initial git commit', function(t){
+  bruck.exec('chunky-bacon', function(){
+    t.ok(assertGitInitialized('chunky-bacon'), 'git directory exists')
+    cleanUp(t.end)
+  })
+})
