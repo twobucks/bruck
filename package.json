@@ -4,8 +4,7 @@
   "description": "Our little assistant for creating NPM packages.",
   "main": "index.js",
   "scripts": {
-    "test": "rm -rf npm-cat chunky-bacon ~/.bruckrc && node ./test/*.js | tap-spec",
-    "debug": "rm -rf npm-cat chunky-bacon ~/.bruckrc && node debug ./test/*.js"
+    "test": "rm -rf npm-cat chunky-bacon ~/.bruckrc && tape ./test/*.js | tap-spec"
   },
   "keywords": [],
   "author": "Hrvoje Simic <shime@twobucks.co>",
