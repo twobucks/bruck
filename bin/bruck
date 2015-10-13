@@ -1,1 +1,5 @@
 #!/usr/bin/env node
+
+var bruck = require('../')
+
+bruck.exec.apply(bruck, process.argv.slice(2))

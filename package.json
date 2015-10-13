@@ -17,7 +17,7 @@
     "tape": "^4.2.1"
   },
   "bin": {
-    "bruck": "./bin/bruck"
+    "bruck": "bin/bruck"
   },
   "dependencies": {
     "chdir": "0.0.0",

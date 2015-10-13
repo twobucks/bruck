@@ -26,6 +26,7 @@ module.exports = {
 
   exec: function (name, description, callback) {
     var self = this
+    var callback = callback || function(){}
 
     if (typeof (description) === 'function') {
       callback = description
@@ -36,7 +37,7 @@ module.exports = {
         throw error
       }
 
-      var packageJSON = path.join('template', 'package.json')
+      var packageJSON = path.join(__dirname, 'template', 'package.json')
       var t = template(packageJSON)
       self.__copyLicense(name)
       self.__copyReadme(name, description)
@@ -56,7 +57,7 @@ module.exports = {
    */
 
    __copyLicense: function(dir){
-    var template = fs.readFileSync(path.join('template', 'LICENSE'), 'utf8')
+    var template = fs.readFileSync(path.join(__dirname, 'template', 'LICENSE'), 'utf8')
     fs.writeFileSync(path.join(dir, 'LICENSE'), this.__evaluteTemplate(template))
   },
 
@@ -69,7 +70,7 @@ module.exports = {
    */
 
    __copyReadme: function(name, description){
-    var template = fs.readFileSync(path.join('template', 'README.md'), 'utf8')
+    var template = fs.readFileSync(path.join(__dirname, 'template', 'README.md'), 'utf8')
     fs.writeFileSync(path.join(name, 'README.md'), this.__evaluteTemplate(template, name, description))
   },
 
@@ -100,6 +101,8 @@ module.exports = {
    */
 
   __evaluteTemplate: function(template, name, description){
+    description = description || ""
+
     try {
     return template.replace(/\%\{([^\}]*)\}/g, function(_, match){
       return eval(match).toString()
