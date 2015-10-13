@@ -123,7 +123,6 @@ test('populates readme with title and description it gets as arguments', functio
 })
 
 test('creates LICENSE file with proper year', function(t){
-  // TODO: stop hardcoding year in LICENSE file
   bruck.exec(DIRECTORY_NAME, function () {
     t.ok(assertLicenseYear(DIRECTORY_NAME), 'license contains current year')
     t.end()
