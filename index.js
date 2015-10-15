@@ -127,7 +127,7 @@ module.exports = {
 
 function writePackageJSON (directory, description, templateOptions, configOptions) {
   configOptions['description'] = description || configOptions['description']
-  fs.appendFileSync(path.join(directory, 'package.json'), JSON.stringify(merge(templateOptions, configOptions)))
+  fs.appendFileSync(path.join(directory, 'package.json'), JSON.stringify(merge(templateOptions, configOptions), null, 2))
 }
 
 /*
