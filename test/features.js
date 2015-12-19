@@ -25,18 +25,16 @@ function assertDirectoryExists (name, callback) {
  * Checks if package.json contains correct values
  * from ~/.bruckrc.
  */
-function assertPackageJSONPopulated (dir, config) {
+function assertPackageJSONPopulated (t, dir, config) {
   var packageJSON = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'))
   var patch = diff(config, packageJSON)
-
   var keys = Object.keys(config)
+
   keys.forEach(function (key) {
     if (!deepEqual(config[key], patch[key])) {
-      return false
+      t.ok(config[key] === patch[key], key + " is not equal " + patch[key])
     }
   })
-
-  return true
 }
 
 function assertLicenseYear(dir){
@@ -79,12 +77,12 @@ function setupBruckRC (data) {
     },
     'author': 'Hrvoje Simic <shime@twobucks.co>',
     'license': 'MIT',
-    'devDependencies': {
-      'deep-equal': '^1.0.1',
-      'hdiff': '^1.1.2',
-      'standard': '^3.0.0',
-      'tap-spec': '^4.1.0',
-      'tape': '^4.2.1'
+    "devDependencies": {
+      "deep-equal": "^1.0.1",
+      "hdiff": "^1.1.2",
+      "standard": "^3.0.0",
+      "tap-spec": "^4.1.0",
+      "tape": "^4.2.1"
     }
   }
   fs.appendFileSync(homeDir('.bruckrc'), JSON.stringify(data))
@@ -103,24 +101,34 @@ test('creates a new folder with the name that was passed', function (t) {
 
 test('populates package.json with the defaults saved in ~/.bruckrc', function (t) {
   var config = {
-    'scripts': {
-      'test': 'standard && node ./test/*.js | tap-spec'
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+      "test": "rm -rf npm-cat chunky-bacon ~/.bruckrc && tape ./test/*.js | tap-spec"
     },
-    'author': 'Hrvoje Simic <shime@twobucks.co>',
-    'license': 'MIT',
-    'devDependencies': {
-      'deep-equal': '^1.0.1',
-      'hdiff': '^1.1.2',
-      'standard': '^3.0.0',
-      'tap-spec': '^4.1.0',
-      'tape': '^4.2.1'
+    "keywords": [],
+    "author": "Hrvoje Simic <shime@twobucks.co>",
+    "license": "MIT",
+    "devDependencies": {
+      "deep-equal": "^1.0.1",
+      "standard": "^3.0.0",
+      "tap-spec": "^4.1.0",
+      "tape": "^4.2.1"
+    },
+    "bin": {
+      "bruck": "bin/bruck"
+    },
+    "dependencies": {
+      "chdir": "0.0.0",
+      "deep-extend": "^0.4.0",
+      "home-dir": "^1.0.0"
     }
   }
   setupBruckRC(config)
 
   bruck.exec(DIRECTORY_NAME, function () {
-    t.ok(assertPackageJSONPopulated(DIRECTORY_NAME, config),
-         'package.json gets correct values from ~/.bruckrc')
+    assertPackageJSONPopulated(t, DIRECTORY_NAME, config),
+         'package.json gets correct values from ~/.bruckrc'
 
     cleanUp(t.end)
     cleanUpBruckRC()
@@ -129,10 +137,10 @@ test('populates package.json with the defaults saved in ~/.bruckrc', function (t
 
 test('populates package.json with the correct title/description', function (t) {
   bruck.exec('name', 'description', function () {
-    t.ok(assertPackageJSONPopulated('name', {
+    assertPackageJSONPopulated(t, 'name', {
       name: 'name',
       description: 'description'
-    }), 'package.json has the correct title/description')
+    }, 'package.json has the correct title/description')
     exec('rm -rf name', t.end)
   })
 })
