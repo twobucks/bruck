@@ -127,6 +127,16 @@ test('populates package.json with the defaults saved in ~/.bruckrc', function (t
   })
 })
 
+test('populates package.json with the correct title/description', function (t) {
+  bruck.exec('name', 'description', function () {
+    t.ok(assertPackageJSONPopulated('name', {
+      name: 'name',
+      description: 'description'
+    }), 'package.json has the correct title/description')
+    exec('rm -rf name', t.end)
+  })
+})
+
 test('populates readme with title and description it gets as arguments', function (t) {
   setupBruckRC()
 
