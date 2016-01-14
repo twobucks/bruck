@@ -129,7 +129,8 @@ function writePackageJSON (directory, description, templateOptions, configOption
   configOptions['description'] = description || configOptions['description']
   configOptions['name'] = directory || configOptions['name']
 
-  fs.appendFileSync(path.join(directory, 'package.json'), JSON.stringify(merge(templateOptions, configOptions), null, 2))
+  fs.appendFileSync(path.join(directory, 'package.json'),
+                    JSON.stringify(merge(templateOptions, configOptions), null, 2))
 }
 
 /*
